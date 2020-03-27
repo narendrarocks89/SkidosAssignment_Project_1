@@ -202,7 +202,7 @@ namespace TMPro.Examples
                 }
 
 
-                // Word Selection Handling
+                // Word Selection OperationHandling
                 if (wordIndex != -1 && wordIndex != m_selectedWord && !(Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)))
                 {
                     m_selectedWord = wordIndex;
