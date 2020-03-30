@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using TMPro;
+using System.IO;
 using UnityEngine.UI;
+using System.Collections.Generic;
 
 public class SubmitData : MonoBehaviour
 {
@@ -14,34 +16,44 @@ public class SubmitData : MonoBehaviour
 
     public GameObject SubmittedObj;
 
+    public class PlayerData
+    {
+        public string Key;
+        public string Value;
+    }
+
     void OnEnable()
     {
         Reset();
     }
 
-    private const string keyName = "Key";
-        public string KeyName
-        {
-            get { return PlayerPrefs.GetString(keyName); }
-            set { PlayerPrefs.SetString(keyName, value); }
-        }
-        private const string valueOfKey = "Value";
-        public string ValueOfKey
-        {
-            get { return PlayerPrefs.GetString(valueOfKey); }
-            set { PlayerPrefs.SetString(valueOfKey, value); }
-        }
+    void Start()
+    {
+        //string loadJson = File.ReadAllText(Application.dataPath + "/Json Files/saveFile.json");
+        //playerData = JsonUtility.FromJson<PlayerData>(loadJson);
+    }
 
     public void Submit()
     {
-        KeyName = keyText.text;
-        ValueOfKey = ValueText.text;
+        if (string.IsNullOrEmpty(keyText.text) && string.IsNullOrEmpty(ValueText.text))
+            return;
 
-        ScreenPanel.SetActive(false);
-        SubmittedObj.SetActive(true);
+        PlayerData playerData = new PlayerData
+        {
+            Key = keyText.text,
+            Value = ValueText.text
+        };
+        
+        string json = JsonUtility.ToJson(playerData);
+        Debug.Log(json);
 
-        BackButton.SetActive(true);
-        SubmitButton.SetActive(false);
+        SaveSystem.Save(json);
+        
+        //ScreenPanel.SetActive(false);
+        //SubmittedObj.SetActive(true);
+
+        //BackButton.SetActive(true);
+        //SubmitButton.SetActive(false);
     }
 
     public void Back()
@@ -59,5 +71,20 @@ public class SubmitData : MonoBehaviour
         ScreenPanel.SetActive(true);
         BackButton.SetActive(false);
         SubmitButton.SetActive(true);
+    }
+
+    private void Load()
+    {
+        string saveString = SaveSystem.Load();
+        if(saveString != null)
+        {
+            PlayerData playerData = JsonUtility.FromJson<PlayerData>(saveString);
+            Debug.Log("Key : " + playerData.Key);
+            Debug.Log("Value : " + playerData.Value);
+        }
+        else
+        {
+            Debug.Log("File is missing.");
+        }
     }
 }
